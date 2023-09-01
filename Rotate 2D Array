@@ -1,0 +1,41 @@
+#include <stdio.h>
+
+int main() {
+    int size, rotations;
+    int choice; int i;
+    printf("Enter size: "); scanf("%d",&size);
+    int arr[size];
+    printf("Enter array elements: ");
+    for(i=0;i<size;i++){
+        scanf("%d",&arr[i]);
+    }
+    printf("Rotation direction: 1. Right or 2. Left\n");
+    printf("Enter choice: ");
+    scanf("%d",&choice);
+    printf("Enter number rotations: ");
+    scanf("%d", &rotations);
+    int temp[size];
+    for(i=0;i<size;i++){
+        temp[i] = arr[i];
+    }
+    switch (choice) {
+        case 1:
+            for(i=0;i<size;i++){
+                arr[(i+rotations)%size] = temp[i];
+            }
+            break;
+        case 2: 
+            for(i=0;i<size;i++){
+                arr[i] = temp[(i+rotations)%size];
+            }
+            break;
+        default:
+            printf("Invalid choice.\n");
+            return 1;
+    }
+    printf("Rotated array: ");
+    for(i=0;i<size;i++){
+        printf("%d ", arr[i]);
+    }
+    return 0;
+}
