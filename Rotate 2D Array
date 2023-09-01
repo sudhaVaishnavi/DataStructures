@@ -1,41 +1,51 @@
 #include <stdio.h>
-
+#include <stdlib.h>
 int main() {
-    int size, rotations;
-    int choice; int i;
-    printf("Enter size: "); scanf("%d",&size);
-    int arr[size];
-    printf("Enter array elements: ");
-    for(i=0;i<size;i++){
-        scanf("%d",&arr[i]);
+    int rows, cols, rotations;
+    int choice; int i, j;
+    printf("Enter number of rows: "); scanf("%d",&rows);
+    printf("Enter number of columns: "); scanf("%d",&cols);
+    int arr[rows][cols];
+	printf("Enter array elements: ");
+    for(i=0;i<rows;i++){
+        for(j=0;j<cols;j++){
+            scanf("%d",&arr[i][j]);
+        }
     }
-    printf("Rotation direction: 1. Right or 2. Left\n");
-    printf("Enter choice: ");
-    scanf("%d",&choice);
-    printf("Enter number rotations: ");
-    scanf("%d", &rotations);
-    int temp[size];
-    for(i=0;i<size;i++){
-        temp[i] = arr[i];
+    printf("Rotaion, 1. Right or 2. Left\n");
+    printf("Enter choice: "); scanf("%d",&choice);
+    printf("Enter number of rotations: "); scanf("%d",&rotations);
+    int temp[rows][cols];
+    for(i=0;i<rows;i++){
+        for(j=0;j<cols;j++){
+            temp[i][j] = arr[i][j];
+        }
     }
-    switch (choice) {
+    switch(choice){
         case 1:
-            for(i=0;i<size;i++){
-                arr[(i+rotations)%size] = temp[i];
+            for(i=0;i<rows;i++){
+                for(j=0;j<cols;j++){
+                    arr[i][(j+rotations)%cols] = temp[i][j];
+                }
             }
             break;
-        case 2: 
-            for(i=0;i<size;i++){
-                arr[i] = temp[(i+rotations)%size];
+        case 2:
+            for(i=0;i<rows;i++){
+                for(j=0;j<cols;j++){
+                    arr[i][j] = temp[i][(j+rotations)%cols];
+                }
             }
             break;
         default:
             printf("Invalid choice.\n");
             return 1;
     }
-    printf("Rotated array: ");
-    for(i=0;i<size;i++){
-        printf("%d ", arr[i]);
+    printf("Rotated array:\n");
+    for(i=0;i<rows;i++){
+        for(j=0;j<cols;j++){
+            printf("%d ",arr[i][j]);
+        }
+        printf("\n");
     }
     return 0;
 }
