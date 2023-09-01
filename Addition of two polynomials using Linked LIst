@@ -1,0 +1,100 @@
+#include <stdio.h>
+#include <stdlib.h>
+typedef struct node {
+    int power;
+    int coefficient;
+    struct node* next;
+}node;
+node* append(node* tail, int power, int coefficient){
+    node* newnode = (node*)malloc(sizeof(node));
+    newnode->power = power;
+    newnode->coefficient = coefficient;
+    newnode->next = NULL;
+    if(tail != NULL){
+        tail->next = newnode;
+    }
+    return newnode;
+}
+node* polynomialAdd(node* head1, node* head2){
+    node* head = NULL; node* p1 = head1;
+    node* p2 = head2; node* tail = NULL; 
+    while(p1 != NULL || p2 != NULL){
+        node* newnode = (node*)malloc(sizeof(node));
+        newnode->next = NULL;
+        if(p1 != NULL && (p2 == NULL || p1->power > p2->power)){
+            newnode->coefficient = p1->coefficient;
+            newnode->power = p1->power;
+            p1 = p1->next;
+        }else if(p2 != NULL && (p1 == NULL || p2->power > p1->power)){
+            newnode->coefficient = p2->coefficient;
+            newnode->power = p2->power;
+            p2 = p2->next;
+        }else if(p1 != NULL && p2 != NULL && p1->power == p2->power){
+            int combined_coefficient = p1->coefficient + p2->coefficient;
+            if(combined_coefficient != 0) {
+                newnode->coefficient = combined_coefficient;
+                newnode->power = p1->power;
+                p1 = p1->next;
+                p2 = p2->next;
+            }else{
+                free(newnode);
+                p1 = p1->next;
+                p2 = p2->next;
+                continue;
+            }
+        }
+        if(newnode->coefficient != 0){
+            if(head == NULL){
+                head = newnode;
+                tail = newnode;
+            }else{
+                tail->next = newnode;
+                tail = newnode;
+            }
+        }else{
+            free(newnode);
+        }
+    }
+    return head;
+}
+void display(node* head) {
+    node* current = head;
+    while(current != NULL) {
+        printf("%dx^%d", current->coefficient, current->power);
+        current = current->next;
+        if(current != NULL) {
+            printf(" + ");
+        }
+    }
+    printf("\n");
+}
+void insert_term(node** head, int coefficient, int power) {
+    node* newnode = (node*)malloc(sizeof(node));
+    newnode->coefficient = coefficient;
+    newnode->power = power;
+    newnode->next = *head;
+    *head = newnode;
+}
+int main() {
+    node* p1 = NULL; node* p2 = NULL; node* result = NULL;
+    int n1, n2; int i;
+    printf("number of terms in first polynomial: "); scanf("%d",&n1);
+    for(i=0;i<n1;i++){
+        int coef, exp;
+        printf("coefficient and exponent for term %d: ", i + 1);
+        scanf("%d %d", &coef, &exp);
+        insert_term(&p1, coef, exp);
+    }
+    printf("number of terms in second polynomial: "); scanf("%d",&n2);
+    for(i=0;i<n2;i++) {
+        int coef, exp;
+        printf("coefficient and exponent for term %d: ", i + 1);
+        scanf("%d %d", &coef, &exp);
+        insert_term(&p2, coef, exp);
+    }
+    printf("\nFirst polynomial: "); display(p1);
+    printf("Second polynomial: "); display(p2);
+    result = polynomialAdd(p1, p2);
+    printf("Resultant polynomial after addition: "); display(result);
+    return 0;
+}
