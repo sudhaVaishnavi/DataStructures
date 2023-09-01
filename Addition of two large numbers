@@ -1,0 +1,105 @@
+#include<stdio.h>
+#include<stdlib.h>
+struct node{
+	int data;
+	struct node *next;
+};
+typedef struct node node;
+node *reverse(node *head){
+	node *ptr = NULL, *next = NULL;
+	node *temp = head;
+	while(temp != NULL){
+		next  = temp->next;
+		temp->next = ptr;
+		ptr = temp;
+		temp = next;
+	}
+	return ptr;
+}
+node *addition(node *p1, node *p2){
+	p1 = reverse(p1);
+	p2 = reverse(p2);
+	node *result = NULL;
+	node *p3 = NULL;
+	int temp = 0;
+	while(p1 != NULL || p2 != NULL){
+		int sum = temp;
+		if(p1 != NULL){
+			sum += p1->data;
+			p1 = p1->next;
+		}if(p2 != NULL){
+			sum += p2->data;
+			p2=p2->next;
+		}
+		temp = sum/10;
+		sum %= 10;
+		node *newnode =(node*)malloc(sizeof(node));
+		newnode->data = sum;
+		newnode->next = NULL;
+		if(result == NULL){
+			result = newnode;
+			p3 = result;
+		}else{
+			p3->next = newnode;
+			p3 = p3->next;
+		}
+	}if(temp>0){
+		node *newnode = (node*)malloc(sizeof(node));
+		newnode->data = temp;
+		newnode->next = NULL;
+		p3->next = newnode;
+	}
+	return reverse(result);
+}
+node *create(int data){
+	node *newnode = (node*)malloc(sizeof(node));
+	newnode->data = data;
+	newnode->next = NULL;
+	return newnode;
+}
+void display(node *head){
+	node *ptr = head;
+	while(ptr != NULL){
+		printf("%d",ptr->data);
+		ptr= ptr->next;
+	}
+	printf("\n");
+}
+int main(){
+	node *p1 = NULL, *p2 = NULL;
+	int n1, n2;
+	printf("First : ");
+	scanf("%d",&n1);
+	printf("Second : ");
+	scanf("%d",&n2);
+	while(n1>0){
+		int num = n1%10;
+		node *newnode = create(num);
+		newnode->next = p1;
+		p1 = newnode;
+		n1 /= 10;
+	}while(n2>0){
+		int num = n2%10;
+		node *newnode = create(num);
+		newnode->next = p2;
+		p2 = newnode;
+		n2 /= 10;
+	}
+	node *result = addition(p1, p2);
+	printf("Result: ");
+	display(result);
+	while(p1 != NULL){
+		node *temp = p1;
+		p1 = p1->next;
+		free(temp);
+	}while(p2 != NULL){
+		node *temp = p2;
+		p2 = p2->next;
+		free(temp);
+	}while(result != NULL){
+		node *temp = result;
+		result = result->next;
+		free(temp);
+	}
+	return 0;
+}
