@@ -1,0 +1,56 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define MAX_SIZE 100
+struct Stack {
+    char items[MAX_SIZE];
+    int top;
+};
+void initialize(struct Stack *stack){ stack->top = -1; }
+int isEmpty(struct Stack *stack){ return stack->top == -1; }
+void push(struct Stack *stack, char item){
+    if(stack->top == MAX_SIZE - 1){ printf("Overflow\n"); return; }
+    stack->items[++stack->top] = item;
+}
+char pop(struct Stack *stack){
+    if(isEmpty(stack)){ printf("Underflow\n"); return '\0'; }
+    return stack->items[stack->top--];
+}
+int getPrecedence(char choice) {
+    switch (choice) {
+        case '+':
+        case '-':
+            return 1;
+        case '*':
+        case '/':
+            return 2;
+        case '^':
+            return 3;
+    }
+    return 0;
+}
+
+void infixToPostfix(char *infix, char *postfix){
+    struct Stack stack; initialize(&stack);
+    int i = 0, j = 0;
+    while(infix[i] != '\0'){
+        char symbol = infix[i];
+        if(symbol >= '0' && symbol <= '9'){ postfix[j++] = symbol; }
+		else if(symbol == '('){ push(&stack, symbol); }
+		else if(symbol == ')'){
+            while(!isEmpty(&stack) && stack.items[stack.top] != '('){ postfix[j++] = pop(&stack); }
+            if (!isEmpty(&stack) && stack.items[stack.top] == '('){ pop(&stack); }
+        }else{
+            while(!isEmpty(&stack) && getPrecedence(symbol) <= getPrecedence(stack.items[stack.top])){ postfix[j++] = pop(&stack); }
+            push(&stack, symbol);
+        }i++;
+    }
+    while(!isEmpty(&stack)){ postfix[j++] = pop(&stack); }
+    postfix[j] = '\0';
+}
+int main(){
+    char infix[MAX_SIZE]; char postfix[MAX_SIZE];
+    printf("Enter infix expression: "); fgets(infix, sizeof(infix), stdin); infixToPostfix(infix, postfix);
+    printf("Postfix expression: %s\n", postfix);
+    return 0;
+}
