@@ -1,0 +1,59 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include <string.h>
+#define MAX_SIZE 100
+struct Stack {
+    int data[MAX_SIZE];
+    int top;
+};
+void initialize(struct Stack *stack) { stack->top = -1; }
+int isEmpty(struct Stack *stack) { return stack->top == -1; }
+void push(struct Stack *stack, int value){
+    if(stack->top == MAX_SIZE - 1){
+        printf("overflow\n");
+        exit(1);
+    } stack->data[++(stack->top)] = value;
+}
+int pop(struct Stack *stack){
+    if(isEmpty(stack)){ printf("underflow\n"); exit(1); }
+    return stack->data[(stack->top)--];
+}
+int evaluatePostfix(char postfix[]){
+    struct Stack stack;
+    initialize(&stack);
+    int i; int length = strlen(postfix);
+    for(i=0;i<length;i++){
+        if(isdigit(postfix[i])){
+            int num = 0;
+            while(isdigit(postfix[i])){ num = num * 10 + (postfix[i] - '0'); i++; }
+            i--; push(&stack, num);
+        }else if(!isspace(postfix[i])){
+            int op2 = pop(&stack); int op1 = pop(&stack);
+            switch (postfix[i]) {
+                case '+':
+                    push(&stack, op1 + op2);
+                    break;
+                case '-':
+                    push(&stack, op1 - op2);
+                    break;
+                case '*':
+                    push(&stack, op1 * op2);
+                    break;
+                case '/':
+                    push(&stack, op1 / op2);
+                    break;
+                default:
+                    printf("Invalid operator\n");
+                    exit(1);
+            }
+        }
+    }
+    return pop(&stack);
+}
+int main(){
+    char postfix[MAX_SIZE];
+    printf("Enter the postfix expression: "); fgets(postfix, sizeof(postfix), stdin);
+    int result = evaluatePostfix(postfix); printf("Evaluated: %d\n", result);
+    return 0;
+}
