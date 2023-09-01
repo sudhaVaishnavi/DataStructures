@@ -1,0 +1,160 @@
+#include <stdio.h>
+#include <stdlib.h>
+typedef struct node {
+    int power;
+    int coefficient;
+    struct node* next;
+}node;
+
+void insert_term(node** head, int coefficient, int power);
+void display(node* head);
+node* polynomialMultiply(node* head1, node* head2);
+node* mergeSort(node* head);
+node* splitList(node* head, node** second_half);
+node* merge(node* left, node* right);
+void mergeLikeTerms(node* head);
+
+void insert_term(node** head, int coefficient, int power){
+    node* new_term = (node*)malloc(sizeof(node));
+    new_term->coefficient = coefficient;
+    new_term->power = power;
+    new_term->next = NULL;
+    if(*head == NULL){
+        *head = new_term;
+        return;
+    }
+    node* current = *head;
+    while(current->next != NULL){
+        current = current->next;
+    }
+    current->next = new_term;
+}
+void display(node* head){
+    node* current = head;
+    while(current != NULL){
+        printf("%dx^%d", current->coefficient, current->power);
+        if(current->next != NULL){
+            printf(" + ");
+        }
+        current = current->next;
+    }
+    printf("\n");
+}
+
+node* polynomialMultiply(node* head1, node* head2){
+    node* result_head = NULL; node* tail = NULL;
+    node* pl = head1;
+    while(pl != NULL){
+        node* p2 = head2;
+        while(p2 != NULL){
+            int power = pl->power + p2->power;
+            int coefficient = pl->coefficient * p2->coefficient;
+            if(result_head == NULL){
+                result_head = (node*)malloc(sizeof(node));
+                result_head->power = power;
+                result_head->coefficient = coefficient;
+                result_head->next = NULL;
+                tail = result_head;
+            }else{
+                tail->next = (node*)malloc(sizeof(node));
+                tail = tail->next;
+                tail->power = power;
+                tail->coefficient = coefficient;
+                tail->next = NULL;
+            }
+            p2 = p2->next;
+        }
+        pl = pl->next;
+    }
+    node* merged_result = mergeSort(result_head);
+    mergeLikeTerms(merged_result);
+    return merged_result;
+}
+node* mergeSort(node* head){
+    if(head == NULL || head->next == NULL){
+        return head;
+    }
+    node* middle;
+    node* second_half;
+    middle = splitList(head, &second_half);
+    node* left = mergeSort(head);
+    node* right = mergeSort(second_half);
+    node* sorted_head = merge(left, right);
+    return sorted_head;
+}
+node* splitList(node* head, node** second_half){
+    node* slow = head; node* fast = head; node* prev = NULL;
+    while(fast != NULL && fast->next != NULL){
+        prev = slow;
+        slow = slow->next;
+        fast = fast->next->next;
+    }
+    if(prev != NULL){
+        prev->next = NULL;
+    }
+    *second_half = slow;
+    return slow;
+}
+node* merge(node* left, node* right){
+    if(left == NULL){
+        return right;
+    }if(right == NULL){
+        return left;
+    }
+    node* result;
+    if(left->power > right->power){
+        result = left;
+        result->next = merge(left->next, right);
+    }else{
+        result = right;
+        result->next = merge(left, right->next);
+    }
+    return result;
+}
+void mergeLikeTerms(node* head){
+    node* current = head;
+    while(current != NULL){
+        node* runner = current->next;
+        while(runner != NULL && runner->power == current->power){
+            current->coefficient += runner->coefficient;
+            node* temp = runner;
+            runner = runner->next;
+            free(temp);
+        }
+        current->next = runner;
+        current = current->next;
+    }
+}
+
+int main(){
+    node* p1 = NULL; node* p2 = NULL; node* result_multiply = NULL;
+    int n1, n2; int i;
+    
+    printf("number of terms in first polynomial: "); scanf("%d",&n1);
+    for(i=0;i<n1;i++){
+        int coef, exp;
+        printf("coefficient and exponent for term %d: ", i + 1); scanf("%d %d", &coef, &exp);
+        insert_term(&p1, coef, exp);
+    }
+    printf("number of terms in second polynomial: "); scanf("%d",&n2);
+    for(i=0;i<n2;i++){
+        int coef, exp;
+        printf("coefficient and exponent for term %d: ", i + 1); scanf("%d %d", &coef, &exp);
+        insert_term(&p2, coef, exp);
+    }
+
+    printf("\nFirst polynomial: "); display(p1);
+    printf("Second polynomial: "); display(p2);
+
+    result_multiply = polynomialMultiply(p1, p2);
+
+    printf("Resultant polynomial after multiplication: "); display(result_multiply);
+
+    node* current = result_multiply;
+    while(current != NULL){
+        node* temp = current;
+        current = current->next;
+        free(temp);
+    }
+    return 0;
+}
