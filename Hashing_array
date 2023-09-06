@@ -1,0 +1,92 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <time.h>
+
+#define MAX_SIZE 10000
+
+int data[MAX_SIZE];
+int index_map[MAX_SIZE];
+int size = 0;
+
+void init() { size = 0; }
+bool insert(int x) {
+    if (index_map[x] != 0)
+        return false; 
+    size++;
+    data[size] = x;
+    index_map[x] = size;
+    return true;
+}
+bool Remove(int x){
+    if (index_map[x] == 0)
+        return false; 
+    int index = index_map[x];
+    data[index] = data[size];
+    index_map[data[index]] = index;
+    size--;
+    index_map[x] = 0;
+    return true;
+}
+int getRandom(){
+    srand(time(NULL));
+    int rIndex = rand() % size + 1;
+    return data[rIndex];
+}
+bool search(int x) {
+    return index_map[x] != 0;
+}
+void display(){ int i;
+    printf("output elements: ");
+    for(i=1;i<=size;i++){
+        printf("%d ",data[i]);
+    }
+    printf("\n");
+}
+int main() {
+    init();
+    int ch, x;
+    while(1){
+        printf("Choose an operation:\n");
+        printf("1. Insert\n");
+        printf("2. Remove\n");
+        printf("3. Search\n");
+        printf("4. Get Random\n");
+        printf("5. Exit\n");
+        printf("Enter choice: ");
+        scanf("%d", &ch);
+
+        switch(ch){
+            case 1:
+                printf("Element to insert: "); scanf("%d",&x);
+                if(insert(x)){
+                    printf("insertion done.\n");
+                    display();
+                }else{ printf("element already exists, insertion not possilble.\n"); }
+                break;
+            case 2:
+                printf("element to remove: "); scanf("%d",&x);
+                if(Remove(x)){
+                    printf("removal done.\n");
+                    display();
+                }else{ printf("element does not exists, removal not possilble.\n"); }
+                break;
+            case 3:
+                printf("element to search: "); scanf("%d", &x);
+                if(search(x)){
+                    printf("element found\n");
+                }else{ printf("element not found\n"); }
+                break;
+            case 4:
+                if(size>0){
+                    printf("Random element: %d\n", getRandom());
+                }else{ printf("data structure is empty.\n"); }
+                break;
+            case 5:
+                exit(0);
+            default:
+                printf("Invalid choice\n");
+        }
+    }
+    return 0;
+}
