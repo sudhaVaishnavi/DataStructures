@@ -1,0 +1,72 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct node{
+    int val;
+    struct node* next;
+};
+struct node* merge(struct node* l, struct node* r) {
+    if (l == NULL) return r;
+    if (r == NULL) return l;
+    struct node* mergedList = NULL;
+    if(l->val <= r->val){
+        mergedList = l;
+        mergedList->next = merge(l->next, r);
+    }else{
+        mergedList = r;
+        mergedList->next = merge(l, r->next);
+    }
+    return mergedList;
+}
+struct node* mergesort(struct node* head){
+    if (head == NULL || head->next == NULL){ return head; }
+    struct node* a = head;
+    struct node* b = head->next;
+    while(b != NULL && b->next != NULL){
+        a = a->next;
+        b = b->next->next;
+    }
+    struct node* l = head; struct node* r = a->next;
+    a->next = NULL; 
+    l = mergesort(l); r = mergesort(r);
+    return merge(l,r);
+}
+void insert(struct node** head, int val) {
+    struct node* newnode=(struct node*)malloc(sizeof(struct node));
+    newnode->val=val;
+    newnode->next=NULL;
+    if(*head==NULL){
+        *head=newnode;
+    }else{
+        struct node* curr=*head;
+        while(curr->next != NULL){
+            curr = curr->next;
+        }
+        curr->next = newnode;
+    }
+}
+void display(struct node* head){
+    struct node* curr = head;
+    while(curr != NULL){
+        printf("%d ", curr->val);
+        curr=curr->next;
+    }
+    printf("\n");
+}
+int main(){
+    struct node* head = NULL;
+    int num, e;
+    int i;
+    printf("number of elements in linked list: "); scanf("%d",&num);
+    printf("elements of linked list: ");
+    for(i=0;i<num;i++){
+        scanf("%d",&e);
+        insert(&head,e);
+    }
+    printf("Original linked list: ");
+    display(head);
+    head = mergesort(head);
+    printf("Sorted linked list: ");
+    display(head);
+    return 0;
+}
